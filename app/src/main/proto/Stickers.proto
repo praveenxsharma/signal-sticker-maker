@@ -1,0 +1,17 @@
+syntax = "proto3";
+package signal;
+
+option java_package = "com.signalsticker.maker.signal";
+option java_outer_classname = "StickerPackProto";
+
+message Pack {
+  message Sticker {
+    uint32 id = 1;
+    string emoji = 2;
+  }
+
+  string title = 1;
+  string author = 2;
+  Sticker cover = 3;
+  repeated Sticker stickers = 4;
+}
