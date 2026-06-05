@@ -25,7 +25,8 @@ data class AppColors(
 
 val LocalColors = staticCompositionLocalOf<AppColors> { error("AppColors not provided") }
 
-val C: AppColors get() = LocalColors.current
+val C: AppColors
+  @Composable get() = LocalColors.current
 
 private val Light = AppColors(
   canvas = Color(0xFFF8F8F8),
