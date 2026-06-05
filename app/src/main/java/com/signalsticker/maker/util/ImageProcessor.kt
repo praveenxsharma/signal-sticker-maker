@@ -19,8 +19,8 @@ object ImageProcessor {
   ): Result<ByteArray> = withContext(Dispatchers.Default) {
     runCatching {
       val opts = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-      resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, opts) }
-        ?: error("Cannot open $uri")
+      val input = resolver.openInputStream(uri) ?: error("Cannot open $uri")
+      input.use { BitmapFactory.decodeStream(it, null, opts) }
 
       val scale = maxOf(opts.outWidth, opts.outHeight) / SIZE
       val sampleSize = if (scale > 0) Integer.highestOneBit(scale) else 1
