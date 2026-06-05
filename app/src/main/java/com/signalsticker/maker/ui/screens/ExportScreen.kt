@@ -124,10 +124,14 @@ fun ExportScreen(vm: MainViewModel, onBack: () -> Unit) {
             }
             val uri = FileProvider.getUriForFile(ctx, "${ctx.packageName}.fileprovider", File(ctx.cacheDir, name))
             runCatching {
-              ctx.startActivity(Intent(Intent.ACTION_VIEW).apply {
-                setDataAndType(uri, "application/zip")
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-              })
+              ctx.startActivity(Intent.createChooser(
+                Intent(Intent.ACTION_SEND).apply {
+                  type = "application/zip"
+                  putExtra(Intent.EXTRA_STREAM, uri)
+                  addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                },
+                "Open sticker pack in Signal",
+              ))
             }
           }
         },
@@ -139,7 +143,7 @@ fun ExportScreen(vm: MainViewModel, onBack: () -> Unit) {
       Spacer(Modifier.height(8.dp))
 
       Text(
-        "Saved to Downloads/StickerPacks/sticker-pack.signal.zip\nSignal should open automatically to install the pack.",
+        "Saved to Downloads/StickerPacks/sticker-pack.signal.zip\nShare it with Signal to install the pack.",
         textAlign = TextAlign.Center, color = C.muted, fontSize = 12.sp,
       )
 
