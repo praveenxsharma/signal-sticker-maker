@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.signalsticker.maker.ui.screens.HomeScreen
 import com.signalsticker.maker.ui.screens.ExportScreen
+import com.signalsticker.maker.ui.theme.StickerPackTheme
 import com.signalsticker.maker.viewmodel.MainViewModel
 
 class MainActivity : ComponentActivity() {
@@ -18,14 +19,16 @@ class MainActivity : ComponentActivity() {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
     setContent {
-      val vm: MainViewModel = viewModel()
-      val nav = rememberNavController()
-      NavHost(nav, startDestination = "home") {
-        composable("home") {
-          HomeScreen(vm, onNavExport = { nav.navigate("export") })
-        }
-        composable("export") {
-          ExportScreen(vm, onBack = { nav.popBackStack() })
+      StickerPackTheme {
+        val vm: MainViewModel = viewModel()
+        val nav = rememberNavController()
+        NavHost(nav, startDestination = "home") {
+          composable("home") {
+            HomeScreen(vm, onNavExport = { nav.navigate("export") })
+          }
+          composable("export") {
+            ExportScreen(vm, onBack = { nav.popBackStack() })
+          }
         }
       }
     }

@@ -46,70 +46,71 @@ fun HomeScreen(vm: MainViewModel, onNavExport: () -> Unit) {
     }
   ) { pad ->
     Column(
-      modifier = Modifier.fillMaxSize().padding(pad).verticalScroll(rememberScrollState()).padding(24.dp),
+      modifier = Modifier.fillMaxSize().padding(pad).verticalScroll(rememberScrollState()),
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
       if (st.stickers.isEmpty() && !st.processing) {
-        Spacer(Modifier.height(96.dp))
-        Text("Signal Sticker Pack", fontSize = 36.sp, fontWeight = FontWeight(400), color = C.ink)
-        Spacer(Modifier.height(4.dp))
-        Text("Maker", fontSize = 36.sp, fontWeight = FontWeight(400), color = C.primary)
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(64.dp))
         Text(
-          "Pick images to create a pack.\nResized to 512×512 WebP.",
-          textAlign = TextAlign.Center, color = C.muted, fontSize = 15.sp,
+          "Pick images to create a\nSignal sticker pack.",
+          textAlign = TextAlign.Center, color = C.muted, fontSize = 16.sp,
         )
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(24.dp))
         Button(
           onClick = { picker.launch("image/*") },
           colors = ButtonDefaults.buttonColors(containerColor = C.primary),
           shape = RoundedCornerShape(8.dp),
-          modifier = Modifier.height(44.dp).widthIn(max = 260.dp).fillMaxWidth(),
+          modifier = Modifier.height(44.dp).widthIn(max = 220.dp).fillMaxWidth(),
         ) { Text("Pick Images", fontSize = 15.sp, fontWeight = FontWeight(500)) }
         Spacer(Modifier.height(8.dp))
         TextButton(onClick = { picker.launch("image/gif") }) {
           Text("or pick GIFs / animations", color = C.muted)
         }
       } else {
-        Text("${st.stickers.size}/200 stickers", fontWeight = FontWeight(500), color = C.ink)
-        Spacer(Modifier.height(12.dp))
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-          itemsIndexed(st.stickers) { i, s ->
-            Thumb(s, i, onRemove = { vm.removeSticker(s.id) })
+        Column(
+          modifier = Modifier.padding(24.dp).fillMaxWidth(),
+          horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+          Text("${st.stickers.size}/200 stickers", fontWeight = FontWeight(500), color = C.ink, fontSize = 14.sp)
+          Spacer(Modifier.height(12.dp))
+          LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            itemsIndexed(st.stickers) { i, s ->
+              Thumb(s, i, onRemove = { vm.removeSticker(s.id) })
+            }
           }
-        }
-        Spacer(Modifier.height(24.dp))
-        OutlinedTextField(
-          value = st.title,
-          onValueChange = { vm.setTitle(it) },
-          label = { Text("Pack Title") },
-          singleLine = true,
-          modifier = Modifier.fillMaxWidth(),
-          shape = RoundedCornerShape(8.dp),
-        )
-        Spacer(Modifier.height(12.dp))
-        OutlinedTextField(
-          value = st.author,
-          onValueChange = { vm.setAuthor(it) },
-          label = { Text("Author") },
-          singleLine = true,
-          modifier = Modifier.fillMaxWidth(),
-          shape = RoundedCornerShape(8.dp),
-        )
-        Spacer(Modifier.height(16.dp))
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-          OutlinedButton(
-            onClick = { picker.launch("image/*") },
-            modifier = Modifier.weight(1f),
+          Spacer(Modifier.height(24.dp))
+          OutlinedTextField(
+            value = st.title,
+            onValueChange = { vm.setTitle(it) },
+            label = { Text("Pack Title") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(8.dp),
-          ) { Text("+ Add More") }
-          Button(
-            onClick = { vm.export(); onNavExport() },
-            enabled = st.stickers.isNotEmpty() && st.title.isNotBlank(),
-            colors = ButtonDefaults.buttonColors(containerColor = C.primary),
-            modifier = Modifier.weight(1f),
+          )
+          Spacer(Modifier.height(12.dp))
+          OutlinedTextField(
+            value = st.author,
+            onValueChange = { vm.setAuthor(it) },
+            label = { Text("Author") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(8.dp),
-          ) { Text("Preview & Export") }
+          )
+          Spacer(Modifier.height(16.dp))
+          Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            OutlinedButton(
+              onClick = { picker.launch("image/*") },
+              modifier = Modifier.weight(1f),
+              shape = RoundedCornerShape(8.dp),
+            ) { Text("+ Add More") }
+            Button(
+              onClick = { vm.export(); onNavExport() },
+              enabled = st.stickers.isNotEmpty() && st.title.isNotBlank(),
+              colors = ButtonDefaults.buttonColors(containerColor = C.primary),
+              modifier = Modifier.weight(1f),
+              shape = RoundedCornerShape(8.dp),
+            ) { Text("Preview & Export") }
+          }
         }
       }
 
