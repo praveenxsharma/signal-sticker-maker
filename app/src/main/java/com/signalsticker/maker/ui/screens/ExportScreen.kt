@@ -26,6 +26,9 @@ import androidx.core.content.FileProvider
 import coil.compose.AsyncImage
 import com.signalsticker.maker.ui.theme.C
 import com.signalsticker.maker.viewmodel.MainViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -33,6 +36,7 @@ import java.io.File
 fun ExportScreen(vm: MainViewModel, onBack: () -> Unit) {
   val st by vm.s.collectAsState()
   val ctx = LocalContext.current
+  val scope = rememberCoroutineScope()
 
   Scaffold(
     containerColor = C.canvas,
@@ -103,24 +107,28 @@ fun ExportScreen(vm: MainViewModel, onBack: () -> Unit) {
         onClick = {
           val zip = st.exportZip ?: return@Button
           val name = "sticker-pack.signal.zip"
-          File(ctx.cacheDir, name).writeBytes(zip)
-          if (Build.VERSION.SDK_INT >= 29) {
-            val vals = ContentValues().apply {
-              put(MediaStore.Downloads.DISPLAY_NAME, name)
-              put(MediaStore.Downloads.MIME_TYPE, "application/zip")
-              put(MediaStore.Downloads.RELATIVE_PATH, "${Environment.DIRECTORY_DOWNLOADS}/StickerPacks")
+          scope.launch {
+            withContext(Dispatchers.IO) {
+              File(ctx.cacheDir, name).writeBytes(zip)
+              if (Build.VERSION.SDK_INT >= 29) {
+                val vals = ContentValues().apply {
+                  put(MediaStore.Downloads.DISPLAY_NAME, name)
+                  put(MediaStore.Downloads.MIME_TYPE, "application/zip")
+                  put(MediaStore.Downloads.RELATIVE_PATH, "${Environment.DIRECTORY_DOWNLOADS}/StickerPacks")
+                }
+                runCatching {
+                  val dlUri = ctx.contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, vals)!!
+                  ctx.contentResolver.openOutputStream(dlUri)?.use { it.write(zip) }
+                }
+              }
             }
+            val uri = FileProvider.getUriForFile(ctx, "${ctx.packageName}.fileprovider", File(ctx.cacheDir, name))
             runCatching {
-              val dlUri = ctx.contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, vals)!!
-              ctx.contentResolver.openOutputStream(dlUri)?.use { it.write(zip) }
+              ctx.startActivity(Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, "application/zip")
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+              })
             }
-          }
-          val uri = FileProvider.getUriForFile(ctx, "${ctx.packageName}.fileprovider", File(ctx.cacheDir, name))
-          runCatching {
-            ctx.startActivity(Intent(Intent.ACTION_VIEW).apply {
-              setDataAndType(uri, "application/zip")
-              addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            })
           }
         },
         colors = ButtonDefaults.buttonColors(containerColor = C.primary),
