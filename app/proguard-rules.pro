@@ -1,0 +1,4 @@
+-keep class com.signalsticker.maker.signal.StickerPackProto { *; }
+-keep class com.signalsticker.maker.signal.StickerPackProto$* { *; }
+-keep class com.signalsticker.maker.signal.StickerCrypto { *; }
+-keep class com.signalsticker.maker.signal.StickerPackEncoder { *; }
