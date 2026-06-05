@@ -1,7 +1,10 @@
 package com.signalsticker.maker.ui.screens
 
+import android.content.ContentValues
 import android.content.Intent
-import android.net.Uri
+import android.os.Build
+import android.os.Environment
+import android.provider.MediaStore
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -98,25 +101,36 @@ fun ExportScreen(vm: MainViewModel, onBack: () -> Unit) {
       Button(
         onClick = {
           val zip = st.exportZip ?: return@Button
-          val file = File(ctx.cacheDir, "sticker-pack.signal.zip")
-          file.writeBytes(zip)
-          val uri = FileProvider.getUriForFile(ctx, "${ctx.packageName}.fileprovider", file)
-          val intent = Intent(Intent.ACTION_SEND).apply {
-            type = "application/zip"
-            putExtra(Intent.EXTRA_STREAM, uri)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+          val name = "sticker-pack.signal.zip"
+          File(ctx.cacheDir, name).writeBytes(zip)
+          if (Build.VERSION.SDK_INT >= 29) {
+            val vals = ContentValues().apply {
+              put(MediaStore.Downloads.DISPLAY_NAME, name)
+              put(MediaStore.Downloads.MIME_TYPE, "application/zip")
+              put(MediaStore.Downloads.RELATIVE_PATH, "${Environment.DIRECTORY_DOWNLOADS}/StickerPacks")
+            }
+            runCatching {
+              val dlUri = ctx.contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, vals)!!
+              ctx.contentResolver.openOutputStream(dlUri)?.use { it.write(zip) }
+            }
           }
-          ctx.startActivity(Intent.createChooser(intent, "Share sticker pack to Signal"))
+          val uri = FileProvider.getUriForFile(ctx, "${ctx.packageName}.fileprovider", File(ctx.cacheDir, name))
+          runCatching {
+            ctx.startActivity(Intent(Intent.ACTION_VIEW).apply {
+              setDataAndType(uri, "application/zip")
+              addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            })
+          }
         },
         colors = ButtonDefaults.buttonColors(containerColor = C.primary),
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier.fillMaxWidth().height(44.dp),
-      ) { Text("Export & Share", fontWeight = FontWeight(500)) }
+      ) { Text("Export to Signal", fontWeight = FontWeight(500)) }
 
       Spacer(Modifier.height(8.dp))
 
       Text(
-        "Share the .signal.zip file to Signal.\nSignal will detect it and prompt to install.",
+        "Saved to Downloads/StickerPacks/sticker-pack.signal.zip\nSignal should open automatically to install the pack.",
         textAlign = TextAlign.Center, color = C.muted, fontSize = 12.sp,
       )
 

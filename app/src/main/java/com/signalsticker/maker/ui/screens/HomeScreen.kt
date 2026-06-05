@@ -86,6 +86,15 @@ fun HomeScreen(vm: MainViewModel, onNavExport: () -> Unit) {
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(8.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+              focusedTextColor = C.ink,
+              unfocusedTextColor = C.ink,
+              cursorColor = C.primary,
+              focusedBorderColor = C.primary,
+              unfocusedBorderColor = C.hairline,
+              focusedLabelColor = C.primary,
+              unfocusedLabelColor = C.muted,
+            ),
           )
           Spacer(Modifier.height(12.dp))
           OutlinedTextField(
@@ -95,6 +104,15 @@ fun HomeScreen(vm: MainViewModel, onNavExport: () -> Unit) {
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(8.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+              focusedTextColor = C.ink,
+              unfocusedTextColor = C.ink,
+              cursorColor = C.primary,
+              focusedBorderColor = C.primary,
+              unfocusedBorderColor = C.hairline,
+              focusedLabelColor = C.primary,
+              unfocusedLabelColor = C.muted,
+            ),
           )
           Spacer(Modifier.height(16.dp))
           Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
