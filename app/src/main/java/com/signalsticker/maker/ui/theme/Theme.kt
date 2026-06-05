@@ -45,19 +45,19 @@ private val Light = AppColors(
 )
 
 private val Dark = AppColors(
-  canvas = Color(0xFF1C1B1F),
-  primary = Color(0xFFCC785C),
-  primaryActive = Color(0xFFD9917A),
-  surface = Color(0xFF2B2930),
-  dark = Color(0xFF000000),
-  ink = Color(0xFFE6E1E5),
-  body = Color(0xFFCAC4D0),
-  muted = Color(0xFF9E9BA6),
-  mutedSoft = Color(0xFF7A7682),
-  hairline = Color(0xFF49454F),
+  canvas = Color(0xFF181715),       // surface-dark
+  primary = Color(0xFFCC785C),       // primary (unchanged)
+  primaryActive = Color(0xFFD9917A), // lighter coral for dark bg
+  surface = Color(0xFF252320),       // surface-dark-elevated
+  dark = Color(0xFF000000),          // true black top bar
+  ink = Color(0xFFFAF9F5),          // on-dark cream text
+  body = Color(0xFFC8C3B8),         // slightly muted cream
+  muted = Color(0xFFA09D96),        // on-dark-soft
+  mutedSoft = Color(0xFF7A7670),    // further muted
+  hairline = Color(0xFF353330),     // subtle dark divider
   onPrimary = Color(0xFFFFFFFF),
-  onDark = Color(0xFFE6E1E5),
-  error = Color(0xFFF2B8B8),
+  onDark = Color(0xFFFAF9F5),       // on-dark
+  error = Color(0xFFE87474),        // lighter red for dark bg
   success = Color(0xFF5DB872),
 )
 
