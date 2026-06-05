@@ -29,36 +29,36 @@ val C: AppColors
   @Composable get() = LocalColors.current
 
 private val Light = AppColors(
-  canvas = Color(0xFFF8F8F8),
+  canvas = Color(0xFFFAF9F5),
   primary = Color(0xFFCC785C),
   primaryActive = Color(0xFFA9583E),
-  surface = Color(0xFFFFFFFF),
-  dark = Color(0xFF1C1B1F),
-  ink = Color(0xFF1C1B1F),
-  body = Color(0xFF49454F),
-  muted = Color(0xFF7A7682),
-  mutedSoft = Color(0xFF9E9BA6),
-  hairline = Color(0xFFE7E0EC),
+  surface = Color(0xFFEFE9DE),
+  dark = Color(0xFF181715),
+  ink = Color(0xFF141413),
+  body = Color(0xFF3D3D3A),
+  muted = Color(0xFF6C6A64),
+  mutedSoft = Color(0xFF8E8B82),
+  hairline = Color(0xFFE6DFD8),
   onPrimary = Color(0xFFFFFFFF),
-  onDark = Color(0xFFF8F8F8),
+  onDark = Color(0xFFFAF9F5),
   error = Color(0xFFC64545),
   success = Color(0xFF5DB872),
 )
 
 private val Dark = AppColors(
-  canvas = Color(0xFF181715),       // surface-dark
-  primary = Color(0xFFCC785C),       // primary (unchanged)
-  primaryActive = Color(0xFFD9917A), // lighter coral for dark bg
-  surface = Color(0xFF252320),       // surface-dark-elevated
-  dark = Color(0xFF000000),          // true black top bar
-  ink = Color(0xFFFAF9F5),          // on-dark cream text
-  body = Color(0xFFC8C3B8),         // slightly muted cream
-  muted = Color(0xFFA09D96),        // on-dark-soft
-  mutedSoft = Color(0xFF7A7670),    // further muted
-  hairline = Color(0xFF353330),     // subtle dark divider
+  canvas = Color(0xFF181715),
+  primary = Color(0xFFCC785C),
+  primaryActive = Color(0xFFA9583E),
+  surface = Color(0xFF252320),
+  dark = Color(0xFF000000),
+  ink = Color(0xFFFAF9F5),
+  body = Color(0xFFA09D96),
+  muted = Color(0xFF8E8B82),
+  mutedSoft = Color(0xFF6C6A64),
+  hairline = Color(0xFF353330),
   onPrimary = Color(0xFFFFFFFF),
-  onDark = Color(0xFFFAF9F5),       // on-dark
-  error = Color(0xFFE87474),        // lighter red for dark bg
+  onDark = Color(0xFFFAF9F5),
+  error = Color(0xFFC64545),
   success = Color(0xFF5DB872),
 )
 

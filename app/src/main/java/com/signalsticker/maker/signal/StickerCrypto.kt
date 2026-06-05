@@ -13,16 +13,16 @@ object StickerCrypto {
   private const val IV_LENGTH = 16
   private const val HMAC_LENGTH = 32
 
-  fun deriveKeys(packKeyHex: String): Pair<SecretKeySpec, SecretKeySpec> {
+  fun deriveKeys(key: String): Pair<SecretKeySpec, SecretKeySpec> {
     val hkdf = HkdfSha256()
-    val key = hkdf.deriveKey(packKeyHex.hexToBytes(), INFO.toByteArray(), KEY_LENGTH / 8)
-    val aesKey = SecretKeySpec(key.copyOfRange(0, 32), "AES")
-    val hmacKey = SecretKeySpec(key.copyOfRange(32, 64), "HmacSHA256")
+    val raw = hkdf.deriveKey(key.hexToBytes(), INFO.toByteArray(), KEY_LENGTH / 8)
+    val aesKey = SecretKeySpec(raw.copyOfRange(0, 32), "AES")
+    val hmacKey = SecretKeySpec(raw.copyOfRange(32, 64), "HmacSHA256")
     return aesKey to hmacKey
   }
 
-  fun encrypt(data: ByteArray, packKeyHex: String): ByteArray {
-    val (aesKey, hmacKey) = deriveKeys(packKeyHex)
+  fun encrypt(data: ByteArray, key: String): ByteArray {
+    val (aesKey, hmacKey) = deriveKeys(key)
     val iv = ByteArray(IV_LENGTH).apply { SecureRandom().nextBytes(this) }
 
     val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
@@ -38,34 +38,10 @@ object StickerCrypto {
     return iv + encrypted + hmac
   }
 
-  fun decrypt(encrypted: ByteArray, packKeyHex: String): ByteArray {
-    val (aesKey, hmacKey) = deriveKeys(packKeyHex)
-    val iv = encrypted.copyOfRange(0, IV_LENGTH)
-    val body = encrypted.copyOfRange(IV_LENGTH, encrypted.size - HMAC_LENGTH)
-    val hmac = encrypted.copyOfRange(encrypted.size - HMAC_LENGTH, encrypted.size)
-
-    val mac = Mac.getInstance("HmacSHA256")
-    mac.init(hmacKey)
-    mac.update(iv)
-    mac.update(body)
-    val expected = mac.doFinal()
-    if (!expected.contentEquals(hmac)) throw SecurityException("HMAC mismatch")
-
-    val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
-    cipher.init(Cipher.DECRYPT_MODE, aesKey, IvParameterSpec(iv))
-    return cipher.doFinal(body)
-  }
-
-  fun generatePackKey(): String {
+  fun generateKey(): String {
     val bytes = ByteArray(32)
     SecureRandom().nextBytes(bytes)
     return bytes.toHex()
-  }
-
-  fun packKeyToId(packKeyHex: String): String {
-    val hkdf = HkdfSha256()
-    val id = hkdf.deriveKey(packKeyHex.hexToBytes(), "Sticker Pack ID".toByteArray(), 16)
-    return id.toHex()
   }
 }
 

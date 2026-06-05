@@ -45,20 +45,13 @@ class MainViewModel : ViewModel() {
           }
           .onFailure { e -> _s.value = _s.value.copy(error = e.message) }
       }
-      _s.value = _s.value.copy(stickers = cur, processing = false)
+      _s.update { it.copy(stickers = cur, processing = false) }
     }
   }
 
   fun removeSticker(id: Int) {
     _s.value = _s.value.copy(stickers = _s.value.stickers.filter { it.id != id })
     dat.remove(id)
-  }
-
-  fun reorder(from: Int, to: Int) {
-    val list = _s.value.stickers.toMutableList()
-    if (from !in list.indices || to !in list.indices) return
-    list.add(to, list.removeAt(from))
-    _s.value = _s.value.copy(stickers = list)
   }
 
   fun updateEmoji(id: Int, e: String) {
@@ -73,7 +66,7 @@ class MainViewModel : ViewModel() {
   fun export() {
     val st = _s.value
     if (st.stickers.isEmpty() || st.title.isBlank()) return
-    val key = StickerCrypto.generatePackKey()
+    val key = StickerCrypto.generateKey()
     val enc = StickerPackEncoder.encode(
       StickerPack(title = st.title, author = st.author.ifBlank { "Anonymous" }, stickers = st.stickers),
       dat, key,

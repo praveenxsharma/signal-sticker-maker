@@ -11,31 +11,25 @@ import java.io.ByteArrayOutputStream
 
 object ImageProcessor {
 
-  private const val TARGET_SIZE = 512
+  private const val SIZE = 512
 
   suspend fun processImage(
     resolver: ContentResolver,
     uri: Uri,
   ): Result<ByteArray> = withContext(Dispatchers.Default) {
     runCatching {
-      val input = resolver.openInputStream(uri) ?: error("Cannot open $uri")
-      val opts = BitmapFactory.Options().apply {
-        inJustDecodeBounds = true
-      }
-      BitmapFactory.decodeStream(input, null, opts)
-      input.close()
+      val opts = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+      resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, opts) }
+        ?: error("Cannot open $uri")
 
-      val scale = maxOf(opts.outWidth, opts.outHeight) / TARGET_SIZE
+      val scale = maxOf(opts.outWidth, opts.outHeight) / SIZE
       val sampleSize = if (scale > 0) Integer.highestOneBit(scale) else 1
 
-      val decodeOpts = BitmapFactory.Options().apply {
-        inSampleSize = sampleSize
-      }
-      val input2 = resolver.openInputStream(uri) ?: error("Cannot open $uri")
-      val src = BitmapFactory.decodeStream(input2, null, decodeOpts) ?: error("Failed to decode image")
-      input2.close()
+      val decodeOpts = BitmapFactory.Options().apply { inSampleSize = sampleSize }
+      val src = resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, decodeOpts) }
+        ?: error("Failed to decode image")
 
-      val bmp = resizeAndCrop(src, TARGET_SIZE)
+      val bmp = fit(src, SIZE)
       val out = ByteArrayOutputStream()
       bmp.compress(Bitmap.CompressFormat.WEBP_LOSSY, 90, out)
       bmp.recycle()
@@ -44,11 +38,8 @@ object ImageProcessor {
     }
   }
 
-  private fun resizeAndCrop(src: Bitmap, size: Int): Bitmap {
-    val scale = maxOf(
-      size.toFloat() / src.width,
-      size.toFloat() / src.height
-    )
+  private fun fit(src: Bitmap, size: Int): Bitmap {
+    val scale = maxOf(size.toFloat() / src.width, size.toFloat() / src.height)
     val w = (src.width * scale).toInt()
     val h = (src.height * scale).toInt()
     val scaled = Bitmap.createScaledBitmap(src, w, h, true)

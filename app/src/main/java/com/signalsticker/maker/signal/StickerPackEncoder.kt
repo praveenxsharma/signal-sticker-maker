@@ -1,7 +1,6 @@
 package com.signalsticker.maker.signal
 
 import com.signalsticker.maker.model.StickerPack
-import com.signalsticker.maker.model.StickerItem
 import com.signalsticker.maker.signal.StickerPackProto.Pack
 import java.io.ByteArrayOutputStream
 import java.util.zip.ZipEntry
@@ -12,14 +11,12 @@ object StickerPackEncoder {
   data class EncodedPack(
     val manifestBytes: ByteArray,
     val stickerFiles: Map<Int, ByteArray>,
-    val packKey: String,
-    val packId: String,
   )
 
   fun encode(
     pack: StickerPack,
     stickerData: Map<Int, ByteArray>,
-    packKey: String = StickerCrypto.generatePackKey(),
+    packKey: String = StickerCrypto.generateKey(),
   ): EncodedPack {
     val protoPack = Pack.newBuilder().apply {
       title = pack.title
@@ -43,8 +40,6 @@ object StickerPackEncoder {
     return EncodedPack(
       manifestBytes = manifestEncrypted,
       stickerFiles = stickerEncrypted,
-      packKey = packKey,
-      packId = StickerCrypto.packKeyToId(packKey),
     )
   }
 
